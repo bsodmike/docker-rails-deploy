@@ -33,7 +33,9 @@ elif [ -n "$REBUILD" ]; then
 fi
 
 docker ps -a | grep "[^-]app\b" > /dev/null 2>&1
-[ $? -eq 0 ] && docker stop app && docker rm app
+[ $? -eq 0 ] && echo -e "\n===> Stopping and removing running app container.\n" && docker stop app && docker rm app
+
+echo -e "\n===> Linking and running app...\n"
 docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 80:80 -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" --link mysql:webdb ${ORG}/${APP_NAME}-app
 
 echo -e "\n===> Done.\n"
