@@ -2,19 +2,15 @@
 
 ## Notes
 
+* TODO separate deployment scripts for each 'node'.
+
+- nginx load balancer: needs to point at a CNAME record set via AWS
+Routes53.  This saved the need to rebuild the balancer each time the
+droplets are replaced.
+
+## Notes (legacy)
+
 ### MySQL
-
-Ref: https://github.com/tutumcloud/tutum-docker-mysql
-
-**TODO**: Switch to the MySQL image for v5.7
-* https://registry.hub.docker.com/_/mysql/
-* https://github.com/docker-library/mysql/blob/master/5.7/Dockerfile
-* Upgrade to docker 1.2.0
-(http://blog.docker.com/2014/08/announcing-docker-1-2-0/) and use
-restart policies
-* Do not use supervisord etc.
-* Use an init system
-* Systemd + docker start with CoreOS
 
 ```
 # Build the mysql image
