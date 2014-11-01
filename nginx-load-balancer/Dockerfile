@@ -16,15 +16,14 @@ RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
 RUN chown -R www-data:www-data /var/lib/nginx
 
 # Add default nginx config
-ADD nginx-balancer.conf /etc/nginx/sites-enabled/default
+ONBUILD ADD nginx-balancer.conf /etc/nginx/sites-enabled/default
+# Add default foreman config
+ONBUILD ADD Procfile /home/app/Procfile
 
 # Install foreman
 RUN gem install bundler
 RUN gem install foreman
 
 WORKDIR /home/app
-
-# Add default foreman config
-ADD Procfile /home/app/Procfile
 
 CMD foreman start -f Procfile
