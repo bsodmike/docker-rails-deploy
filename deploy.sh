@@ -76,7 +76,7 @@ docker ps -a | grep "mysql[^\-]" | grep "Exited" > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Starting the mysql container.\n" && docker start mysql
 
 echo -e "\n===> Linking and running app instance...\n"
-docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 8080:80 -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" --link mysql:webdb ${ORG}/${APP_NAME}-app
+docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 8080:80 -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" -e "UNICORN_NAME=unicorn.sock" --link mysql:webdb ${ORG}/${APP_NAME}-app
 
 echo -e "\n===> Linking and running app failover instance...\n"
 docker run -d --name app-failover -v /var/log/nginx-app-failover/:/var/log/nginx/ -v /tmp:/tmp -p 8081:80 -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" --link mysql:webdb ${ORG}/${APP_NAME}-app-failover
