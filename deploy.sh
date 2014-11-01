@@ -32,8 +32,14 @@ elif [ -n "$REBUILD" ]; then
   build_app
 fi
 
+docker images | grep '<none>' > /dev/null 2>&1
+[ $? -eq 0 ] && echo -e "\n===> Removing stale images.\n" && docker images | grep '<none>' | awk '{print $3}' | xargs docker rmi
+
 docker ps -a | grep "[^-]app\b" > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Stopping and removing running app container.\n" && docker stop app && docker rm app
+
+docker ps -a | grep "mysql[^\-]" | grep "Exited" > /dev/null 2>&1
+[ $? -eq 0 ] && echo -e "\n===> Starting the mysql container.\n" && docker start mysql
 
 echo -e "\n===> Linking and running app...\n"
 docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 80:80 -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" --link mysql:webdb ${ORG}/${APP_NAME}-app
