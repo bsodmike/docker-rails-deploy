@@ -28,6 +28,9 @@ if [ $? -ne 0 ]; then
   echo -e "\n*** Set SSH deploy key for root user, to clone '${APP_REPO}'\n"
   mkdir -p /opt/deploy > /dev/null 2>&1
   [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to create '/opt/deploy' - need sudo!\n" && exit 1
+
+  ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+
   git clone $APP_REPO /opt/deploy/app
   [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to clone repo!\n" && exit 1
   git clone -b docker/failover --single-branch $APP_REPO /opt/deploy/app_failover
