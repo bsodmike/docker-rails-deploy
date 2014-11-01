@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 8080:80 -e "SECRET_KEY_BASE=foo" --link mysql:webdb inertialbox/inertialbox-app
+docker run -d --name app --restart=on-failure:5 -v /var/log/nginx/:/var/log/nginx/ -v /var/lib/mysql:/var/lib/mysql -v /tmp:/tmp -p 8080:80 -e "SECRET_KEY_BASE=foo" -e "UNICORN_NAME=unicorn.sock" --link mysql:webdb inertialbox/inertialbox-app
 
 
 docker build -t inertialbox/rails-nginx-unicorn-failover rails-nginx-unicorn-failover
