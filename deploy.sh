@@ -4,9 +4,9 @@ WORKDIR=${PWD}
 ORG=inertialbox
 APP_NAME=inertialbox
 APP_REPO=git@bitbucket.org:bsodmike/inertialbox.com.git
-SECRET_KEY_BASE=foo
-MYSQL_ROOT_PASSWORD=0mDF30W43I
-MYSQL_PASSWORD=A307W7oP52j6Fxv
+#SECRET_KEY_BASE=foo
+#MYSQL_ROOT_PASSWORD=0mDF30W43I
+#MYSQL_PASSWORD=A307W7oP52j6Fxv
 
 docker images | grep "^${ORG}/trusty-base" > /dev/null 2>&1
 [ $? -ne 0 ] && docker build -t ${ORG}/trusty-base trusty_base
