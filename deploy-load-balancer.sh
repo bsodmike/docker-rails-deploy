@@ -18,7 +18,7 @@ if [ -n "$REBUILD" ];then
   docker build -t ${ORG}/load-balancer-one inertialbox/load-balancer-one
 
   docker ps -a | grep "[^\-\/]load-balancer-one" > /dev/null 2>&1
-  [ $? -eq 0 ] && echo -e "\n===> Stopping and removing load-balancer-one container.\n" &&\
+  [ $? -eq 0 ] && echo -e "\n===> Stopping and removing the load-balancer-one container.\n" &&\
     docker stop load-balancer-one > /dev/null 2>&1 &&\
     docker rm load-balancer-one > /dev/null 2>&1
 fi
