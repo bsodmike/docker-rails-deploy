@@ -29,7 +29,8 @@ if [ $? -ne 0 ]; then
   mkdir -p /opt/deploy > /dev/null 2>&1
   [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to create '/opt/deploy' - need sudo!\n" && exit 1
 
-  ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+  # Ref: http://serverfault.com/a/631149
+  ssh -o "StrictHostKeyChecking no" -o PasswordAuthentication=no bitbucket.org
 
   git clone $APP_REPO /opt/deploy/app
   [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to clone repo!\n" && exit 1
