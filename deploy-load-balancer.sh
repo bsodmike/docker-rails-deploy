@@ -13,6 +13,9 @@ docker images | grep "^${ORG}/load-balancer-one" > /dev/null 2>&1
 [ $? -ne 0 ] && echo -e "\n===> Building image for load balancer ONE.\n" &&\
   docker build -t ${ORG}/load-balancer-one inertialbox/load-balancer-one
 
+[ -n "$REBUILD" ] && echo -e "\n===> Re-building image for load balancer ONE.\n" &&\
+  docker build -t ${ORG}/load-balancer-one inertialbox/load-balancer-one
+
 docker ps -a | grep "[^\-]load-balancer-one" > /dev/null 2>&1
 [ $? -ne 0 ] && echo -e "\n===> Running load balancer ONE.\n" && \
   docker run -d --name load-balancer-one \
