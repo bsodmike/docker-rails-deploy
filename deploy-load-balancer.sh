@@ -2,6 +2,9 @@
 
 ORG=inertialbox
 
+docker images | grep "^${ORG}/trusty-base" > /dev/null 2>&1
+[ $? -ne 0 ] && docker build -t ${ORG}/trusty-base trusty_base
+
 docker images | grep "^${ORG}/nginx-load-balancer" > /dev/null 2>&1
 [ $? -ne 0 ] && echo -e "\n===> Building image for the base load balancer.\n" &&\
   docker build -t ${ORG}/nginx-load-balancer nginx-load-balancer
