@@ -19,6 +19,7 @@ docker images | grep "^${ORG}/rails-nginx-unicorn-failover" > /dev/null 2>&1
 
 docker ps -a | grep "mysql[^\-]" > /dev/null 2>&1
 if [ $? -ne 0 ]; then
+  echo -e "\n===> Running mysql instance...\n"
   docker run -d --name mysql --restart=on-failure:5 \
     -v /tmp:/tmp \
     -v /etc/mysql:/etc/mysql \
