@@ -23,6 +23,10 @@ if [ -n "$REBUILD" ];then
     docker rm load-balancer-one > /dev/null 2>&1
 fi
 
+docker images | grep '<none>' > /dev/null 2>&1
+[ $? -eq 0 ] && echo -e "\n===> Removing stale images.\n" &&\
+  docker rmi $(docker images -qf dangling=true)
+
 docker ps -a | grep "[^\-\/]load-balancer-one" > /dev/null 2>&1
 [ $? -ne 0 ] && echo -e "\n===> Running load balancer ONE.\n" && \
   docker run -d --name load-balancer-one \
