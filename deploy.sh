@@ -14,9 +14,6 @@ docker images | grep "^${ORG}/trusty-base" > /dev/null 2>&1
 docker images | grep "^${ORG}/rails-nginx-unicorn" > /dev/null 2>&1
 [ $? -ne 0 ] && docker build -t ${ORG}/rails-nginx-unicorn rails-nginx-unicorn
 
-docker images | grep "^${ORG}/rails-nginx-unicorn-failover" > /dev/null 2>&1
-[ $? -ne 0 ] && docker build -t ${ORG}/rails-nginx-unicorn-failover rails-nginx-unicorn-failover
-
 docker ps -a | grep "mysql[^\-]" > /dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo -e "\n===> Running mysql instance...\n"
@@ -29,7 +26,7 @@ if [ $? -ne 0 ]; then
     -e "MYSQL_USER=${APP_NAME}" \
     -e "MYSQL_PASSWORD=${MYSQL_PASSWORD}" \
     -e "MYSQL_DATABASE=${APP_NAME}_production" \
-    mysql:5.7
+    mysql:5.7 /bin/bash ./entrypoint.sh mysqld --user=mysql --socket=/tmp/mysql.sock
 fi
 
 # Fetch app
@@ -44,13 +41,10 @@ if [ $? -ne 0 ]; then
 
   git clone $APP_REPO /opt/deploy/app
   [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to clone repo!\n" && exit 1
-  git clone -b docker/failover --single-branch $APP_REPO /opt/deploy/app_failover
-  [ $? -ne 0 ] && echo -e "\n--[ERROR]: Unable to clone repo!\n" && exit 1
 fi
 
 git_pull(){
   cd /opt/deploy/app && git pull
-  cd /opt/deploy/app_failover && git pull
   cd $WORKDIR
   echo -e "\n===> Fetched latest app changes from git repo '${APP_REPO}'\n"
 }
@@ -61,14 +55,10 @@ git_pull(){
 build_app(){
   echo -e "\n===> Commencing app rebuild...\n"
   docker build -t ${ORG}/${APP_NAME}-app /opt/deploy/app
-  docker build -t ${ORG}/${APP_NAME}-app-failover /opt/deploy/app_failover
   echo -e "\n===> Completed app rebuild.\n"
 }
 
 docker images | grep "^${ORG}/${APP_NAME}-app" > /dev/null 2>&1
-[ $? -ne 0 ] && build_app
-
-docker images | grep "^${ORG}/${APP_NAME}-app-failover" > /dev/null 2>&1
 [ $? -ne 0 ] && build_app
 
 [ -n "$REBUILD" ] && build_app
@@ -80,10 +70,6 @@ docker images | grep '<none>' > /dev/null 2>&1
 docker ps -a | grep "[^-]app\b" > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Stopping and removing app container.\n" &&\
   docker stop app > /dev/null 2>&1 && docker rm app > /dev/null 2>&1
-
-docker ps -a | grep "[^-]app-failover\b" > /dev/null 2>&1
-[ $? -eq 0 ] && echo -e "\n===> Stopping and removing app-failover container.\n" &&\
-  docker stop app-failover > /dev/null 2>&1 && docker rm app-failover > /dev/null 2>&1
 
 docker ps -a | grep "mysql[^\-]" | grep "Exited" > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Starting the mysql container.\n" &&\
@@ -99,15 +85,5 @@ docker run -d --name app --restart=on-failure:5 \
   -e "UNICORN_NAME=unicorn" \
   --link mysql:webdb \
   ${ORG}/${APP_NAME}-app
-
-echo -e "\n===> Linking and running app failover instance...\n"
-docker run -d --name app-failover \
-  -v /var/log/nginx-app-failover/:/var/log/nginx/ \
-  -v /tmp:/tmp \
-  -p 8081:80 \
-  -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" \
-  -e "UNICORN_NAME=unicorn_failover" \
-  --link mysql:webdb \
-  ${ORG}/${APP_NAME}-app-failover
 
 echo -e "\n===> Done.\n"
