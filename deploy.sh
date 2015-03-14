@@ -1,12 +1,24 @@
 #!/bin/bash
 
+source load-env-keys.sh
+
 WORKDIR=${PWD}
-ORG=inertialbox
-APP_NAME=inertialbox
-APP_REPO=git@bitbucket.org:bsodmike/inertialbox.com.git
-#SECRET_KEY_BASE=foo
-#MYSQL_ROOT_PASSWORD=0mDF30W43I
-#MYSQL_PASSWORD=A307W7oP52j6Fxv
+CHECK_KEYS=0
+[ -z "$ORG" ] && CHECK_KEYS=1
+[ -z "$APP_NAME" ] && CHECK_KEYS=1
+[ -z "$APP_REPO" ] && CHECK_KEYS=1
+[ -z "$SECRET_KEY_BASE" ] && CHECK_KEYS=1
+[ -z "$MYSQL_ROOT_PASSWORD" ] && CHECK_KEYS=1
+[ -z "$MYSQL_PASSWORD" ] && CHECK_KEYS=1
+
+if [ $CHECK_KEYS -ne 0 ]; then
+  echo "Check environment variables!" >&2
+  exit 1
+fi
+
+echo "DEPLOY [app] ******************************************************************"
+echo "$APP_NAME"
+echo -e "repo=$APP_REPO\ndb=${APP_NAME}_production"
 
 docker images | grep "^${ORG}/trusty-base" > /dev/null 2>&1
 [ $? -ne 0 ] && docker build -t ${ORG}/trusty-base trusty_base
