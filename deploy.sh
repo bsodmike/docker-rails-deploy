@@ -75,7 +75,7 @@ docker images | grep "^${ORG}/${APP_NAME}-app-failover" > /dev/null 2>&1
 
 docker images | grep '<none>' > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Removing stale images.\n" &&\
-  docker images | grep '<none>' | awk '{print $3}' | xargs docker rmi
+  docker rmi $(docker images -qf dangling=true)
 
 docker ps -a | grep "[^-]app\b" > /dev/null 2>&1
 [ $? -eq 0 ] && echo -e "\n===> Stopping and removing app container.\n" &&\
