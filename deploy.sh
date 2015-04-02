@@ -92,7 +92,7 @@ docker run -d --name app --restart=on-failure:5 \
   -v /var/log/nginx/:/var/log/nginx/ \
   -v /var/lib/mysql:/var/lib/mysql \
   -v /tmp:/tmp \
-  -p 8080:80 \
+  -p 80:80 \
   -e "SECRET_KEY_BASE=${SECRET_KEY_BASE}" \
   -e "UNICORN_NAME=unicorn" \
   --link mysql:webdb \
